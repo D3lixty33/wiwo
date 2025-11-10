@@ -5,6 +5,7 @@ import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
 import { Moon, Sun } from "lucide-react";
 import { ExpenseAdd } from "../actions/expenses/expenses-add";
+import CardData from "@/components/ui/card-custom";
 
 interface ExpenseProps {
   expenses: Expense[];
@@ -271,7 +272,9 @@ export function ExpensesRender({ expenses }: ExpenseProps) {
                 type="number"
                 value={newPricing}
                 onChange={(e) =>
-                  setNewPricing(e.target.value === "" ? "" : Number(e.target.value))
+                  setNewPricing(
+                    e.target.value === "" ? "" : Number(e.target.value)
+                  )
                 }
                 className={`px-3 py-2 rounded-lg border ${
                   errors.pricing
@@ -306,6 +309,17 @@ export function ExpensesRender({ expenses }: ExpenseProps) {
           </form>
         </div>
       )}
+      <div className="flex w-auto h-auto flex-row gap-6 justify-between">
+        <div>
+          <CardData></CardData>
+        </div>
+        <div>
+          <CardData></CardData>
+        </div>
+        <div>
+          <CardData></CardData>
+        </div>
+      </div>
     </div>
   );
 }
