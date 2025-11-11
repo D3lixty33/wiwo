@@ -9,7 +9,6 @@ import { TableLoad } from "../actions/products/products-load";
 import { TableDelete } from "../actions/products/specific-product";
 import { TableUpdate } from "../actions/products/products-update";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Check } from "lucide-react";
 
 interface ProductsTableProps {
   products: Product[];

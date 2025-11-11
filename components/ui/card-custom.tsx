@@ -9,42 +9,29 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { createClient } from "@/lib/supabase/server";
 
-const CardData = () => {
+interface CardDataProps {
+  tipData?: string;
+  value?: number;
+}
+
+const CardData = ({ tipData, value }: CardDataProps) => {
+
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>TOTAL</CardTitle>
-        <CardDescription>
-          Total of all the expenses
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form>
-          <div className="flex flex-col gap-6">
-            {/*
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="m@example.com" />
-            </div>
-            
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-                <a
-                  href="#"
-                  className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                >
-                  Forgot your password?
-                </a>
-              </div>
-              <Input id="password" type="password" />
-            </div>
-            */}
-          </div>
-        </form>
-      </CardContent>
-      {/*
+    <>
+      {tipData === "T" && (
+        <Card className="w-full max-w-md bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+          <CardHeader>
+            <CardTitle>TOTAL</CardTitle>
+            <CardDescription>Total of all the expenses: {value?.toString() ?? "NaN"}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form>
+              <div className="flex flex-col gap-6"></div>
+            </form>
+          </CardContent>
+          {/*
       <CardFooter className='flex-col gap-2'>
         <Button type='submit' className='w-full'>
           Login
@@ -60,7 +47,37 @@ const CardData = () => {
         </div>
       </CardFooter>
       */}
-    </Card>
+        </Card>
+      )}
+
+      {tipData === "N" && (
+        <Card className="w-full max-w-md bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+          <CardHeader>
+            <CardTitle>NETTO</CardTitle>
+            <CardDescription>Total of all the expenses</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form>
+              <div className="flex flex-col gap-6"></div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+
+      {tipData === "C" && (
+        <Card className="w-full max-w-md bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+          <CardHeader>
+            <CardTitle>CALC</CardTitle>
+            <CardDescription>Total of all the expenses</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form>
+              <div className="flex flex-col gap-6"></div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+    </>
   );
 };
 

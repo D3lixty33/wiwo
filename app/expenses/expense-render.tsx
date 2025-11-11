@@ -6,6 +6,8 @@ import { useState, useEffect } from "react";
 import { Moon, Sun } from "lucide-react";
 import { ExpenseAdd } from "../actions/expenses/expenses-add";
 import CardData from "@/components/ui/card-custom";
+import { ExpenseLoad } from "../actions/expenses/expenses-load";
+import { ExpenseDelete } from "../actions/expenses/expenses-remove";
 
 interface ExpenseProps {
   expenses: Expense[];
@@ -18,7 +20,10 @@ export function ExpensesRender({ expenses }: ExpenseProps) {
 
   const [newProduct, setNewProduct] = useState("");
   const [newDescription, setNewDescription] = useState("");
-  const [newPricing, setNewPricing] = useState<number | "">("");
+  const [newPricing, setNewPricing] = useState<number>(0);
+
+  const [selectedProduct, setSelectedProduct] = useState<Expense | null>(null);
+  const [modalDelete, setModalDel] = useState(false);
 
   const [errors, setErrors] = useState<{
     product?: boolean;
@@ -39,7 +44,7 @@ export function ExpensesRender({ expenses }: ExpenseProps) {
     const validation = {
       product: !newProduct.trim(),
       description: !newDescription.trim(),
-      pricing: newPricing === "" || isNaN(Number(newPricing)),
+      pricing: newPricing === 0 || isNaN(Number(newPricing)),
     };
     setErrors(validation);
 
@@ -51,10 +56,28 @@ export function ExpensesRender({ expenses }: ExpenseProps) {
       });
       setNewProduct("");
       setNewDescription("");
-      setNewPricing("");
+      setNewPricing(0);
       setModalOpen(false);
     }
   };
+
+  const handleRemove = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!selectedProduct) return;
+
+    try {
+      await ExpenseDelete(selectedProduct.id); // or TableDelete(selectedProduct.id)
+      setModalDel(false);
+      setSelectedProduct(null);
+
+      // optionally reload the table:
+      await ExpenseLoad();
+    } catch (err) {
+      console.error("Error deleting product:", err);
+    }
+  };
+
+  const totExp = expenses.reduce((acc, exp) => acc + (exp.pricing ?? 0), 0);
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 relative">
@@ -186,10 +209,22 @@ export function ExpensesRender({ expenses }: ExpenseProps) {
 
                   <td className="px-6 py-4 text-right">
                     <div className="inline-flex items-center gap-2">
-                      <button className="text-sm px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700">
+                      <button
+                        className="text-sm px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700"
+                        onClick={() => {
+//                          setEditProd(p);
+//                          setModalEdit(true);
+                        }}
+                      >
                         Edit
                       </button>
-                      <button className="text-sm px-3 py-1 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-800/50">
+                      <button
+                        className="text-sm px-3 py-1 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-800/50"
+                        onClick={() => {
+                          setSelectedProduct(exp);
+                          setModalDel(true);
+                        }}
+                      >
                         Delete
                       </button>
                     </div>
@@ -273,7 +308,7 @@ export function ExpensesRender({ expenses }: ExpenseProps) {
                 value={newPricing}
                 onChange={(e) =>
                   setNewPricing(
-                    e.target.value === "" ? "" : Number(e.target.value)
+                    Number(e.target.value) === 0 ? 0 : Number(e.target.value)
                   )
                 }
                 className={`px-3 py-2 rounded-lg border ${
@@ -309,15 +344,58 @@ export function ExpensesRender({ expenses }: ExpenseProps) {
           </form>
         </div>
       )}
+      {/* Floating delete form */}
+      {modalDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setModalDel(false)}
+          />
+          <form
+            className="relative bg-white dark:bg-slate-900 rounded-xl shadow-xl p-6 w-80 max-w-full z-10 flex flex-col gap-4 transition-all"
+            onSubmit={handleRemove}
+          >
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+              Remove product
+            </h2>
+            <div className="flex flex-col gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+              Are you sure you want to remove this product ?
+              {selectedProduct?.product ? (
+                <span>{selectedProduct.product}</span>
+              ) : (
+                "not found"
+              )}
+            </div>
+            {/* Buttons */}
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setModalDel(false)} // close delete modal only
+                className="px-3 py-1 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
+              >
+                Cancel
+              </button>
+
+              {/* Confirm deletion */}
+              <button
+                type="submit" // this submits the form and calls handleRemove
+                className="px-3 py-1 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
       <div className="flex w-auto h-auto flex-row gap-6 justify-between">
         <div>
-          <CardData></CardData>
+          <CardData tipData="T" value={totExp}></CardData>
         </div>
         <div>
-          <CardData></CardData>
+          <CardData tipData="N"></CardData>
         </div>
         <div>
-          <CardData></CardData>
+          <CardData tipData="C"></CardData>
         </div>
       </div>
     </div>

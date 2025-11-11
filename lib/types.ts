@@ -20,7 +20,7 @@ export type Expense = {
     id : string,
     created_at : string,
     product? : string,
-    product_id?: string;
+    product_id?: string,
     description? : string,
     pricing? : number,
 }
