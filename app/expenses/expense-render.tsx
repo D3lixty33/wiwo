@@ -8,6 +8,7 @@ import { ExpenseAdd } from "../actions/expenses/expenses-add";
 import CardData from "@/components/ui/card-custom";
 import { ExpenseLoad } from "../actions/expenses/expenses-load";
 import { ExpenseDelete } from "../actions/expenses/expenses-remove";
+import { ExpenseUpdate } from "../actions/expenses/expense-update";
 
 interface ExpenseProps {
   expenses: Expense[];
@@ -23,7 +24,9 @@ export function ExpensesRender({ expenses }: ExpenseProps) {
   const [newPricing, setNewPricing] = useState<number>(0);
 
   const [selectedProduct, setSelectedProduct] = useState<Expense | null>(null);
+  const [expenseProduct, setExpenseProd] = useState<Expense | null>(null);
   const [modalDelete, setModalDel] = useState(false);
+  const [modalEdit, setModalEdit] = useState(false);
 
   const [errors, setErrors] = useState<{
     product?: boolean;
@@ -32,6 +35,15 @@ export function ExpensesRender({ expenses }: ExpenseProps) {
   }>({});
 
   useEffect(() => setMounted(true), []);
+
+  // Add it here — above the return!
+  useEffect(() => {
+    if (expenseProduct) {
+      setNewProduct(expenseProduct.product ?? "");
+      setNewDescription(expenseProduct.description ?? "");
+    }
+  }, [expenseProduct]);
+
   if (!mounted) return null;
 
   const isEmpty = expenses.length === 0;
@@ -74,6 +86,38 @@ export function ExpensesRender({ expenses }: ExpenseProps) {
       await ExpenseLoad();
     } catch (err) {
       console.error("Error deleting product:", err);
+    }
+  };
+
+  const handleEdit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!expenseProduct) return; // make sure something is selected
+
+    const validation = {
+      product: !newProduct.trim(),
+      description: !newDescription.trim(),
+    };
+    setErrors(validation);
+
+    if (validation.product || validation.description) return;
+
+    try {
+      await ExpenseUpdate({
+        id: expenseProduct.id, // directly use editProduct.id
+        product: newProduct,
+        description: newDescription,
+      });
+
+      // cleanup
+      setExpenseProd(null);
+      setModalEdit(false);
+      setNewProduct("");
+      setNewDescription("");
+
+      await ExpenseLoad();
+    } catch (error) {
+      console.error("Error editing product:", error);
     }
   };
 
@@ -212,8 +256,8 @@ export function ExpensesRender({ expenses }: ExpenseProps) {
                       <button
                         className="text-sm px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700"
                         onClick={() => {
-//                          setEditProd(p);
-//                          setModalEdit(true);
+                          setExpenseProd(exp);
+                          setModalEdit(true);
                         }}
                       >
                         Edit
@@ -382,6 +426,86 @@ export function ExpensesRender({ expenses }: ExpenseProps) {
                 className="px-3 py-1 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors"
               >
                 Delete
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+      {/* Modal edit form */}
+      {modalEdit && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setModalEdit(false)}
+          />
+          <form
+            onSubmit={handleEdit}
+            className="relative bg-white dark:bg-slate-900 rounded-xl shadow-xl p-6 w-80 max-w-full z-10 flex flex-col gap-4 transition-all"
+          >
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+              Add Product
+            </h2>
+
+            {/* Product */}
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                Product
+              </label>
+              <input
+                type="text"
+                value={newProduct}
+                onChange={(e) => setNewProduct(e.target.value)}
+                className={`px-3 py-2 rounded-lg border ${
+                  errors.product
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-slate-300 dark:border-slate-700 focus:ring-indigo-300"
+                } focus:outline-none focus:ring-1 transition-colors dark:bg-slate-800 dark:text-slate-100 text-xs`}
+                placeholder="Enter product name"
+              />
+              {errors.product && (
+                <span className="text-xs text-red-500">
+                  Product is required
+                </span>
+              )}
+            </div>
+
+            {/* Description */}
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                Description
+              </label>
+              <textarea
+                value={newDescription}
+                onChange={(e) => setNewDescription(e.target.value)}
+                className={`px-3 py-2 rounded-lg border resize-none ${
+                  errors.description
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-slate-300 dark:border-slate-700 focus:ring-indigo-300"
+                } focus:outline-none focus:ring-1 transition-colors dark:bg-slate-800 dark:text-slate-100 text-xs`}
+                placeholder="Enter description"
+                rows={3}
+              />
+              {errors.description && (
+                <span className="text-xs text-red-500">
+                  Description is required
+                </span>
+              )}
+            </div>
+
+            {/* Buttons */}
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setModalEdit(false)}
+                className="px-3 py-1 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-3 py-1 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
+              >
+                Edit
               </button>
             </div>
           </form>
