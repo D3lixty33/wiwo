@@ -1,5 +1,4 @@
 import { createClient } from "@/lib/supabase/server";
-import SubUserSettings from "./subuser-setting/[id]/page";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -7,6 +6,9 @@ export async function SubUsersTable() {
   const supabase = await createClient();
   const { data, error } = await supabase.from("sub_users").select("*");
   const subUsers = data ?? [];
+  const sUserid = subUsers.map((sUsers) => sUsers.id);
+
+  console.log(sUserid);
 
   return (
     <div className="w-full overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-900 transition-colors">
@@ -68,8 +70,11 @@ export async function SubUsersTable() {
 
               <td className="px-6 py-4 text-right">
                 {/* Future “Go to” action (button or link) */}
-                <Button>
-                  <Link href={`/subuser-setting/${sUsers.id}`}>
+                <Button asChild>
+                  <Link
+                    href={`/settings/subuser-setting/${sUsers.id}`}
+                    className="inline-block w-full text-center"
+                  >
                     Go to specs
                   </Link>
                 </Button>

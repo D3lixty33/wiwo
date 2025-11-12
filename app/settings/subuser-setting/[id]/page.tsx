@@ -1,17 +1,18 @@
 import { createClient } from "@/lib/supabase/server";
 
 interface SubUserPageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
 export default async function SubUserPage({ params }: SubUserPageProps) {
+  // unwrap the promise
+  const { id } = await params;
+
   const supabase = await createClient();
   const { data: subUser, error } = await supabase
     .from("sub_users")
     .select("*")
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (error) {
