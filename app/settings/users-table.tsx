@@ -1,4 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
+import SubUserSettings from "./subuser-setting/[id]/page";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export async function SubUsersTable() {
   const supabase = await createClient();
@@ -65,6 +68,11 @@ export async function SubUsersTable() {
 
               <td className="px-6 py-4 text-right">
                 {/* Future “Go to” action (button or link) */}
+                <Button>
+                  <Link href={`/subuser-setting/${sUsers.id}`}>
+                    Go to specs
+                  </Link>
+                </Button>
               </td>
             </tr>
           ))}

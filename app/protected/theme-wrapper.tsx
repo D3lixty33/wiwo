@@ -1,6 +1,7 @@
 "use client";
 
 import { useTheme } from "next-themes";
+import { motion } from "framer-motion";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import React, { useEffect, useState } from "react";
 
@@ -22,12 +23,15 @@ export function ThemeWrapper({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <main
+    <motion.main
       className={`flex flex-col min-h-screen w-full transition-colors duration-300 ${
         theme === "dark"
           ? "bg-slate-900 text-slate-100"
           : "bg-slate-50 text-slate-900"
       }`}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
     >
       <div className="w-full flex flex-col flex-1 items-center px-6 py-10">
         {/* Main content container (matches tables’ cards) */}
@@ -53,6 +57,6 @@ export function ThemeWrapper({ children }: { children: React.ReactNode }) {
           </div>
         </footer>
       </div>
-    </main>
+    </motion.main>
   );
 }
