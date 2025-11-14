@@ -9,7 +9,6 @@ import CardData from "@/components/ui/card-custom";
 import { ExpenseLoad } from "../actions/expenses/expenses-load";
 import { ExpenseDelete } from "../actions/expenses/expenses-remove";
 import { ExpenseUpdate } from "../actions/expenses/expense-update";
-import { Button } from "@/components/ui/button";
 import { PriorityForm } from "@/components/priority-hover";
 
 interface ExpenseProps {
