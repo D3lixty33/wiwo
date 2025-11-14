@@ -9,6 +9,8 @@ import CardData from "@/components/ui/card-custom";
 import { ExpenseLoad } from "../actions/expenses/expenses-load";
 import { ExpenseDelete } from "../actions/expenses/expenses-remove";
 import { ExpenseUpdate } from "../actions/expenses/expense-update";
+import { Button } from "@/components/ui/button";
+import { PriorityForm } from "@/components/priority-hover";
 
 interface ExpenseProps {
   expenses: Expense[];
@@ -22,6 +24,7 @@ export function ExpensesRender({ expenses }: ExpenseProps) {
   const [newProduct, setNewProduct] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const [newPricing, setNewPricing] = useState<number>(0);
+  const [newPriority, setNewPriority] = useState("");
 
   const [selectedProduct, setSelectedProduct] = useState<Expense | null>(null);
   const [expenseProduct, setExpenseProd] = useState<Expense | null>(null);
@@ -32,6 +35,7 @@ export function ExpensesRender({ expenses }: ExpenseProps) {
     product?: boolean;
     description?: boolean;
     pricing?: boolean;
+    priority?: boolean;
   }>({});
 
   useEffect(() => setMounted(true), []);
@@ -57,18 +61,21 @@ export function ExpensesRender({ expenses }: ExpenseProps) {
       product: !newProduct.trim(),
       description: !newDescription.trim(),
       pricing: newPricing === 0 || isNaN(Number(newPricing)),
+      priority: !newPriority.trim()
     };
     setErrors(validation);
 
-    if (!validation.product && !validation.description && !validation.pricing) {
+    if (!validation.product && !validation.description && !validation.pricing && !validation.priority) {
       await ExpenseAdd({
         product: newProduct,
         description: newDescription,
         pricing: Number(newPricing),
+        priority: newPriority
       });
       setNewProduct("");
       setNewDescription("");
       setNewPricing(0);
+      setNewPriority("")
       setModalOpen(false);
     }
   };
@@ -121,7 +128,15 @@ export function ExpensesRender({ expenses }: ExpenseProps) {
     }
   };
 
+  // Total expenses value
   const totExp = expenses.reduce((acc, exp) => acc + (exp.pricing ?? 0), 0);
+
+  //Priority
+  const netto = expenses
+    .filter((exp) => exp.priority === "N")
+    .reduce((acc, exp) => acc + (exp.pricing ?? 0), 0);
+
+  console.log(netto);
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 relative">
@@ -194,6 +209,9 @@ export function ExpensesRender({ expenses }: ExpenseProps) {
                 <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">
                   Pricing
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">
+                  Priority
+                </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                   Actions
                 </th>
@@ -248,6 +266,12 @@ export function ExpensesRender({ expenses }: ExpenseProps) {
                   <td className="px-6 py-4 hidden md:table-cell">
                     <div className="text-sm text-slate-600 dark:text-slate-300">
                       {exp.pricing}
+                    </div>
+                  </td>
+
+                  <td className="px-6 py-4 hidden md:table-cell">
+                    <div className="text-sm text-slate-600 dark:text-slate-300">
+                      <PriorityForm priority={exp.priority ?? ""} />
                     </div>
                   </td>
 
@@ -365,6 +389,28 @@ export function ExpensesRender({ expenses }: ExpenseProps) {
               {errors.pricing && (
                 <span className="text-xs text-red-500">
                   Pricing is required
+                </span>
+              )}
+            </div>
+            {/* Priorita */}
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                Priority
+              </label>
+              <input
+                type="text"
+                value={newPriority}
+                onChange={(e) => setNewPriority(e.target.value)}
+                className={`px-3 py-2 rounded-lg border ${
+                  errors.product
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-slate-300 dark:border-slate-700 focus:ring-indigo-300"
+                } focus:outline-none focus:ring-1 transition-colors dark:bg-slate-800 dark:text-slate-100 text-xs`}
+                placeholder="Enter priority stage"
+              />
+              {errors.product && (
+                <span className="text-xs text-red-500">
+                  Priority is required
                 </span>
               )}
             </div>
@@ -516,7 +562,7 @@ export function ExpensesRender({ expenses }: ExpenseProps) {
           <CardData tipData="T" value={totExp}></CardData>
         </div>
         <div>
-          <CardData tipData="N"></CardData>
+          <CardData tipData="N" value={netto}></CardData>
         </div>
         <div>
           <CardData tipData="C"></CardData>

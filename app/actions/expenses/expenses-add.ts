@@ -7,9 +7,10 @@ interface ProductInput {
   product: string;
   description: string;
   pricing: number;
+  priority: string;
 }
 
-export async function ExpenseAdd({ product, description, pricing }: ProductInput) {
+export async function ExpenseAdd({ product, description, pricing, priority }: ProductInput) {
   const supabase = await createClient();
 
   const parsedPricing = Number(pricing);
@@ -17,7 +18,7 @@ export async function ExpenseAdd({ product, description, pricing }: ProductInput
 
   const { error } = await supabase
     .from("expenses")
-    .insert([{ product, description, pricing }]); // must be an array of objects
+    .insert([{ product, description, pricing, priority }]); // must be an array of objects
 
   if (error) {
     console.error("Error inserting product:", error);
