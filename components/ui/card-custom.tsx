@@ -54,7 +54,7 @@ const CardData = ({ tipData, value }: CardDataProps) => {
         <Card className="w-full max-w-md bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
           <CardHeader>
             <CardTitle>NETTO</CardTitle>
-            <CardDescription>Total of all the expenses</CardDescription>
+            <CardDescription>Marked &quot;N&quot; expenses : {value?.toString() ?? "NaN"}</CardDescription>
           </CardHeader>
           <CardContent>
             <form>

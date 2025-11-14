@@ -35,7 +35,7 @@ export function ThemeWrapper({ children }: { children: React.ReactNode }) {
     >
       <div className="w-full flex flex-col flex-1 items-center px-6 py-10">
         {/* Main content container (matches tables’ cards) */}
-        <div className="flex flex-col flex-1 w-full max-w-6xl rounded-2xl shadow-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 gap-12 transition-colors">
+        <div className="flex flex-col flex-1 w-full h-full rounded-2xl shadow-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 gap-12 transition-colors">
           {children}
         </div>
 

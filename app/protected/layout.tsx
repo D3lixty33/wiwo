@@ -9,9 +9,14 @@ export default function ProtectedLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <ThemeWrapper>{children}</ThemeWrapper>
-    </SidebarProvider>
+    <main className="flex w-full h-full gap-8 ">
+      <SidebarProvider className="w-32">
+        <AppSidebar />
+        {/*<ThemeWrapper>{children}</ThemeWrapper>*/}
+      </SidebarProvider>
+      <div className="flex w-full h-auto">
+        Test
+      </div>
+    </main>
   );
 }

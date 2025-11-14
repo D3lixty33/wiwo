@@ -3,7 +3,8 @@ export type Product = {
     created_at : string;
     product? : string;
     description? : string
-    user_id? : string
+    user_id? : string,
+    priority? : string;
 }
 
 export type User = {
@@ -23,4 +24,5 @@ export type Expense = {
     product_id?: string,
     description? : string,
     pricing? : number,
+    priority? : string | ""
 }
